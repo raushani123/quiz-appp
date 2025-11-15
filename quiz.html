@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Simple Quiz With Name</title>
+<style>
+body {
+  font-family: Arial;
+  text-align: center;
+  background: #f5f5f5;
+  padding: 20px;
+}
+.box {
+  width: 320px;
+  margin: auto;
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+}
+.option {
+  background: #ddd;
+  padding: 10px;
+  margin: 8px 0;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.correct { background: #4CAF50 !important; color: white; }
+.wrong { background: #E53935 !important; color: white; }
+.hidden { display: none; }
+</style>
+</head>
+<body>
+
+<!-- NAME INPUT -->
+<div id="nameBox" class="box">
+  <h2>Enter Your Name</h2>
+  <input id="nameInput" type="text" placeholder="Your Name">
+  <br><br>
+  <button onclick="startQuiz()">Start Quiz</button>
+</div>
+
+<!-- QUIZ AREA -->
+<div id="quizBox" class="box hidden">
+  <h3>Player: <span id="playerName"></span></h3>
+  <h2 id="question"></h2>
+  <div id="options"></div>
+  <h3>Score: <span id="score">0</span></h3>
+</div>
+
+<!-- RESULT AREA -->
+<div id="resultBox" class="box hidden">
+  <h1>Quiz Completed!</h1>
+  <h2 id="finalName"></h2>
+  <h3>Your Score: <span id="finalScore"></span></h3>
+  <button onclick="restart()">Restart Quiz</button>
+</div>
+
+<script>
+let questions = [
+  { q: "2 + 2 = ?", options: ["3", "4", "5", "6"], ans: "4" },
+  { q: "Capital of India?", options: ["Delhi", "Mumbai", "Agra", "Goa"], ans: "Delhi" },
+  { q: "Sun rises from?", options: ["East", "North", "West", "South"], ans: "East" },
+  { q: "5 x 2 = ?", options: ["6", "10", "12", "14"], ans: "10" }
+];
+
+let index = 0;
+let score = 0;
+let username = "";
+
+function startQuiz() {
+  username = document.getElementById("nameInput").value.trim();
+  if (username === "") return alert("Please enter your name");
+
+  localStorage.setItem("userNameQuiz", username);
+
+  document.getElementById("nameBox").classList.add("hidden");
+  document.getElementById("quizBox").classList.remove("hidden");
+
+  document.getElementById("playerName").innerText = username;
+
+  loadQuestion();
+}
+
+function loadQuestion() {
+  let q = questions[index];
+  document.getElementById("question").innerText = q.q;
+
+  let opt = document.getElementById("options");
+  opt.innerHTML = "";
+
+  q.options.forEach(o => {
+    let div = document.createElement("div");
+    div.className = "option";
+    div.innerText = o;
+
+    div.onclick = () => checkAnswer(div, o, q.ans);
+
+    opt.appendChild(div);
+  });
+}
+
+function checkAnswer(div, selected, correct) {
+  if (selected === correct) {
+    div.classList.add("correct");
+    score++;
+    document.getElementById("score").innerText = score;
+  } else {
+    div.classList.add("wrong");
+  }
+
+  document.querySelectorAll(".option").forEach(x => x.onclick = null);
+
+  setTimeout(() => {
+    index++;
+    if (index < questions.length) loadQuestion();
+    else showResult();
+  }, 700);
+}
+
+function showResult() {
+  document.getElementById("quizBox").classList.add("hidden");
+  document.getElementById("resultBox").classList.remove("hidden");
+
+  document.getElementById("finalName").innerText = "Player: " + username;
+  document.getElementById("finalScore").innerText = score + "/" + questions.length;
+}
+
+function restart() {
+  location.reload();
+}
+</script>
+
+</body>
+</html>
